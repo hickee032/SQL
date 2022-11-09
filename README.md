@@ -27,3 +27,4 @@ Test Setting.sql -- test account create
 <br>
 6_SUB QUERY_Work.sql
 <br>
+7_DDL DML DCL.sql -- DDL, DML, DCL
