@@ -1,11 +1,10 @@
 --프로시저
---일련의 작업들을 하나로 묶어서 저장해두었다가 호출 하여 이런 작업들이 실행 할수있게 함
+--일련의 작업들을 하나로 묶어서 저장해두었다가 호출 하여 이런 작업들이 실행할수있게 함
 
 /*
 CREATE OR REPLACE PROCEDURE [프로시저 명](
-     [매개변수명] [MODE] [데이터형식]) 
-     IS
-     [변수명] [데이터형식] -- 지역 변수
+     [매개변수명] [MODE] [데이터형식]) IS
+    [변수명] [데이터형식] -- 지역 변수
     );
 BEGIN
 ...
@@ -82,48 +81,7 @@ END;
 
 EXECUTE emp_info2(10);
 
---out 변수를 사용해보자
---부서 테이블에 데이터 추가 (dno,dname,loc 추가)
---기존 dno가 있으면 오류 아니면 추가됨
-create or replace procedure dept_ins_p(
-    v_dno in number, 
-    v_dname in department.dname%type,
-    v_loc in varchar2,
-    v_result out varchar2 --외부로 정보를 출력
-)is
-    cnt number :=0; --실제 dno가 있는 지 판별하는 변수
---사용자 처리 예외처리 (exception)
-    EXIST_DNO_ERR exception;
-begin
-    select count(*) into cnt from department where dno = v_dno and rownum = 1;--dno = v_dno 가 있으면 -- and rownum = 1 > 최종결과값을 1개만 
-    if cnt > 0 then
-        v_result :='등록된 부서번호';
-        raise EXIST_DNO_ERR; --강제로 오류(예외)를 발생 exception 호출 -- (상수 변수는 가급적 대문자로 사용)
-    else insert into department(dno, dname,loc) VALUES (v_dno,v_dname,v_loc);
-        commit;
-        v_result := '정상입력';
-    end if;
-exception 
- when EXIST_DNO_ERR then
- rollback;
- dbms_output.put_line('DB 에러발생');
-end;
-/
 
-SET SERVEROUTPUT ON 
---out 전용 bind 변수
-variable v_res varchar2(50); --넉넉하게 잡아야함 -- 오류 발생
-execute dept_ins_p(12,'개발1팀','대구',:v_res);
-print v_res;
-
-var v_res varchar2(50);
-execute dept_ins_p(15,'개발2팀','서울',:v_res);
-print v_res;
-
---exception 발생
-variable v_res varchar2(50); 
-execute dept_ins_p(10,'개발1팀','대구',:v_res);
-print v_res;
 
  
  
