@@ -1,0 +1,101 @@
+﻿-- 테이블 순서는 관계를 고려하여 한 번에 실행해도 에러가 발생하지 않게 정렬되었습니다.
+
+-- student_t Table Create SQL
+CREATE TABLE student_t
+(
+    st_no       VARCHAR2(20)    NOT NULL, 
+    st_name     VARCHAR2(20)    NULL, 
+    st_major    VARCHAR2(20)    NULL, 
+     PRIMARY KEY (st_no)
+)
+/
+
+COMMENT ON TABLE student_t IS '학생 테이블  --주석은 이곳에 AI 는 시퀀스임'
+/
+
+COMMENT ON COLUMN student_t.st_no IS '학번'
+/
+
+COMMENT ON COLUMN student_t.st_name IS '이름'
+/
+
+COMMENT ON COLUMN student_t.st_major IS '학과'
+/
+
+
+-- subject_t Table Create SQL
+CREATE TABLE subject_t
+(
+    sub_no       VARCHAR2(20)    NOT NULL, 
+    sub_name     VARCHAR2(20)    NOT NULL, 
+    sub_score    VARCHAR2(20)    NOT NULL, 
+     PRIMARY KEY (sub_no)
+)
+/
+
+COMMENT ON TABLE subject_t IS '과목 테이블 Logical Name--주석'
+/
+
+COMMENT ON COLUMN subject_t.sub_no IS '과목번호'
+/
+
+COMMENT ON COLUMN subject_t.sub_name IS '과목이름'
+/
+
+COMMENT ON COLUMN subject_t.sub_score IS '학점'
+/
+
+
+-- regeit_t Table Create SQL
+CREATE TABLE regeit_t
+(
+    reg_no        INT             NOT NULL, 
+    reg_st_no     VARCHAR2(20)    NOT NULL, 
+    reg_sub_no    VARCHAR2(20)    NOT NULL, 
+    reg_date      DATE            NOT NULL, 
+     PRIMARY KEY (reg_no)
+)
+/
+
+CREATE SEQUENCE regeit_t_SEQ
+START WITH 1
+INCREMENT BY 1;
+/
+
+CREATE OR REPLACE TRIGGER regeit_t_AI_TRG
+BEFORE INSERT ON regeit_t 
+REFERENCING NEW AS NEW FOR EACH ROW 
+BEGIN 
+    SELECT regeit_t_SEQ.NEXTVAL
+    INTO :NEW.reg_no
+    FROM DUAL;
+END;
+/
+
+--DROP TRIGGER regeit_t_AI_TRG; /
+
+--DROP SEQUENCE regeit_t_SEQ; /
+
+COMMENT ON COLUMN regeit_t.reg_no IS '등록번호'
+/
+
+COMMENT ON COLUMN regeit_t.reg_st_no IS '학번'
+/
+
+COMMENT ON COLUMN regeit_t.reg_sub_no IS '과목번호'
+/
+
+COMMENT ON COLUMN regeit_t.reg_date IS '등록날짜'
+/
+
+ALTER TABLE regeit_t
+    ADD CONSTRAINT FK_regeit_t_reg_st_no_student_t_st_no FOREIGN KEY (reg_st_no)
+        REFERENCES student_t (st_no) ON DELETE RESTRICT 
+/
+
+ALTER TABLE regeit_t
+    ADD CONSTRAINT FK_regeit_t_reg_sub_no_subject_t_sub_no FOREIGN KEY (reg_sub_no)
+        REFERENCES subject_t (sub_no) ON DELETE RESTRICT 
+/
+
+
